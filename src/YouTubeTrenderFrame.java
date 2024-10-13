@@ -76,7 +76,7 @@ public class YouTubeTrenderFrame extends JFrame {
                 case "Date":
                     videoData.sort((v1, v2) -> v1.getDate().compareTo(v2.getDate()));
                     break;
-                case "Views":
+                case "View":
                     videoData.sort((v1, v2) -> Integer.compare(v2.getViewCount(), v1.getViewCount())); // Descending order
                     break;
                 case "Description":
@@ -391,7 +391,7 @@ public class YouTubeTrenderFrame extends JFrame {
         // Create radio buttons
         channelRadioButton = new JRadioButton("Channel");
         dateRadioButton = new JRadioButton("Date");
-        viewRadioButton = new JRadioButton("Views");
+        viewRadioButton = new JRadioButton("View");
         descriptionRadioButton = new JRadioButton("Description");
 
         // Create a button group to ensure only one radio button can be selected at a time
@@ -447,14 +447,13 @@ public class YouTubeTrenderFrame extends JFrame {
     private JPanel createVideoDetailsPanel() {
         JPanel videoDetailsPanel = new JPanel();
         videoDetailsPanel.setLayout(new GridBagLayout());
-        videoDetailsPanel.setLayout(new GridBagLayout());
-        videoDetailsPanel.setPreferredSize(new Dimension(800, 400));
         videoDetailsPanel.setBorder(BorderFactory.createTitledBorder("Video Details"));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;  // Allow horizontal stretching
 
         // Title
         JLabel titleLabelHeader = new JLabel("Title");
@@ -462,16 +461,18 @@ public class YouTubeTrenderFrame extends JFrame {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         videoDetailsPanel.add(titleLabelHeader, gbc);
         gbc.gridx = 1;
+        gbc.weightx = 1;  // Allow label to grow horizontally
         videoDetailsPanel.add(titleLabel, gbc);
 
         // Thumbnail
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.weightx = 0;  // Reset weightx
         JLabel thumbnailHeader = new JLabel("Thumbnail");
         videoDetailsPanel.add(thumbnailHeader, gbc);
         gbc.gridx = 1;
         thumbnailLabel = new JLabel("Thumbnail Image");
-        thumbnailLabel.setPreferredSize(new Dimension(250, 150));
+        thumbnailLabel.setPreferredSize(null);  // Remove fixed size
         videoDetailsPanel.add(thumbnailLabel, gbc);
 
         // Description with vertical ScrollPane
@@ -488,15 +489,21 @@ public class YouTubeTrenderFrame extends JFrame {
         descriptionLabel.setEditable(false);  // Make it non-editable
 
         JScrollPane descriptionScrollPane = new JScrollPane(descriptionLabel);
-        descriptionScrollPane.setPreferredSize(new Dimension(400, 100));
+        descriptionScrollPane.setPreferredSize(null);  // Remove fixed size
         descriptionScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         descriptionScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+        gbc.weightx = 1;
+        gbc.weighty = 1;  // Allow description to take more vertical space
+        gbc.fill = GridBagConstraints.BOTH;  // Allow the component to grow in both directions
         videoDetailsPanel.add(descriptionScrollPane, gbc);
 
         // Other Info Section (Channel, Date Posted, Category, Live Broadcast Content)
         gbc.gridx = 0;
         gbc.gridy = 3;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;  // Reset fill to horizontal
         JLabel otherHeader = new JLabel("Other");
         videoDetailsPanel.add(otherHeader, gbc);
         gbc.gridx = 1;
@@ -505,6 +512,7 @@ public class YouTubeTrenderFrame extends JFrame {
 
         return videoDetailsPanel;
     }
+
 
     // Create the Other Information Section
     private JPanel createOtherInfoPanel() {
@@ -534,19 +542,33 @@ public class YouTubeTrenderFrame extends JFrame {
     // Create the Statistics Panel for the bar charts
     private JPanel createStatisticsPanel() {
         JPanel statsPanel = new JPanel();
-        statsPanel.setLayout(new GridLayout(1, 3));
+        statsPanel.setLayout(new GridBagLayout());  // Use GridBagLayout for better control
         statsPanel.setBorder(BorderFactory.createTitledBorder("Statistics"));
 
-        chartPanelLikes = createChartPanel("Likes", new Color(0, 153, 76));
-        chartPanelComments = createChartPanel("Comments", new Color(0, 102, 204));
-        chartPanelViews = createChartPanel("Views", new Color(204, 102, 0));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;  // Allow components to grow both horizontally and vertically
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.weightx = 1;  // Allow panels to take equal horizontal space
+        gbc.weighty = 1;  // Allow vertical growth if needed
 
-        statsPanel.add(chartPanelLikes);
-        statsPanel.add(chartPanelComments);
-        statsPanel.add(chartPanelViews);
+        // Add the "Likes" chart panel
+        chartPanelLikes = createChartPanel("Likes", new Color(0, 153, 76));
+        gbc.gridx = 0;
+        statsPanel.add(chartPanelLikes, gbc);
+
+        // Add the "Comments" chart panel
+        chartPanelComments = createChartPanel("Comments", new Color(0, 102, 204));
+        gbc.gridx = 1;
+        statsPanel.add(chartPanelComments, gbc);
+
+        // Add the "Views" chart panel
+        chartPanelViews = createChartPanel("Views", new Color(204, 102, 0));
+        gbc.gridx = 2;
+        statsPanel.add(chartPanelViews, gbc);
 
         return statsPanel;
     }
+
 
     // Helper method to create individual chart panels
     private JPanel createChartPanel(String title, Color barColor) {
